@@ -1,0 +1,35 @@
+﻿# Python / Django
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
+.Python
+
+# Django dev DB and media
+db.sqlite3
+media/
+_media/
+
+# IDE
+.idea/
+*.iml
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Frontend build
+frontend/dist/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
