@@ -1,0 +1,13 @@
+<header class="app-header">
+  <div class="left">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="controls">
+    <!-- Upload dialog component emits (uploaded) when upload completes -->
+    <app-upload-dialog (uploaded)="onUploaded()"></app-upload-dialog>
+
+    <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Recherche ..." />
+    <button (click)="onSearch()">Rechercher</button>
+  </div>
+</header>

@@ -1,0 +1,7 @@
+<label class="upload-control">
+  <input type="file" (change)="onFilePicked($event)" />
+  <span *ngIf="selected">{{ selected.name }}</span>
+  <button (click)="upload()" [disabled]="!selected || uploading">
+    {{ uploading ? 'Envoi...' : 'Ajouter' }}
+  </button>
+</label>

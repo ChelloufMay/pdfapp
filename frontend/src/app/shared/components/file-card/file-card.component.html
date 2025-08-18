@@ -1,0 +1,12 @@
+<div class="card">
+  <div class="thumb">{{ mimeLabel() }}</div>
+  <div class="body">
+    <div class="title">{{ doc.fileName }}</div>
+    <div class="meta">{{ doc.contentType || 'Unknown' }}</div>
+    <div class="meta">Taille: {{ (doc.fileSize / 1024) | number:'1.0-0' }} KB</div>
+  </div>
+  <div class="actions">
+    <a [href]="doc.fileUrl" target="_blank" rel="noopener">Ouvrir</a>
+    <button (click)="onDelete()">Supprimer</button>
+  </div>
+</div>

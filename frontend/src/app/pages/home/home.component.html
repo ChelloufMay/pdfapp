@@ -1,0 +1,11 @@
+<app-header (search)="onSearch($event)" (uploadedEvent)="onUploaded()"></app-header>
+
+<div class="grid">
+  <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDelete($event)"></app-file-card>
+</div>
+
+<div class="pager">
+  <button (click)="pagePrev()" [disabled]="pageIndex===0">‹ Prev</button>
+  <span>Page {{ pageIndex + 1 }} / {{ Math.max(1, Math.ceil(docs.length / pageSize)) }}</span>
+  <button (click)="pageNext()" [disabled]="(pageIndex+1)*pageSize >= docs.length">Next ›</button>
+</div>
