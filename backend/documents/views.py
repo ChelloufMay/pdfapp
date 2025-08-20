@@ -1,7 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from .models import Document
 from .serializers import DocumentSerializer
 from .utils.extractors import extract_text_from_pdf
