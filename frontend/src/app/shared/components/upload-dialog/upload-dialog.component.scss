@@ -1,6 +1,46 @@
+/* upload-dialog.component.scss
+   Simple inline uploader styles
+*/
+
 .upload-control {
   display:flex;
-  gap:8px;
+  gap:10px;
   align-items:center;
+  background: transparent;
+  padding: 4px;
 }
-input[type="file"] { display:block; }
+
+.upload-control input[type="file"] {
+  display: inline-block;
+}
+
+.upload-control span {
+  font-size: 13px;
+  color: #1f3a58;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-control button {
+  background: #4b77ff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(75,119,255,0.12);
+}
+
+.upload-control button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 580px) {
+  .upload-control { gap: 6px; }
+  .upload-control span { max-width: 140px; font-size: 12px; }
+}
+

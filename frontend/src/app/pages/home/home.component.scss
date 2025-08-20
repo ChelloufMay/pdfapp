@@ -1,9 +1,39 @@
+/* home.component.scss
+   Layout for the files grid and pager
+*/
+
+:host { display: block; padding: 12px; }
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
+
 .pager {
-  display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 18px;
+  color: #1d3656;
+}
+
+.pager button {
+  background: transparent;
+  border: 1px solid #e6eefc;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.pager button:disabled { opacity: 0.5; cursor: default; }
+
+/* small-screen adjustments */
+@media (max-width: 520px) {
+  :host { padding: 8px; }
+  .grid { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .pager { font-size: 13px; }
 }
