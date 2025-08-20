@@ -3,14 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { DocumentService, DocumentDto } from '../../core/services/document.service';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FileCardComponent } from '../../shared/components/file-card/file-card.component';
-import { UploadDialogComponent } from '../../shared/components/upload-dialog/upload-dialog.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent, FileCardComponent, UploadDialogComponent],
+  imports: [CommonModule, FormsModule, HeaderComponent, FileCardComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

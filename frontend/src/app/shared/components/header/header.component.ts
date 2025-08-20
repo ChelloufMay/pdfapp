@@ -2,15 +2,12 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// @ts-ignore
 import { UploadDialogComponent } from '../upload-dialog/upload-dialog.component';
-// @ts-ignore
-import {UploadDialog} from "../upload-dialog/upload-dialog";
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, UploadDialogComponent, UploadDialog],
+  imports: [CommonModule, FormsModule, UploadDialogComponent],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
