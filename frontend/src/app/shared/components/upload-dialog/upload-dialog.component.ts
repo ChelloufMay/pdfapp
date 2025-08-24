@@ -1,6 +1,10 @@
-// src/app/shared/components/upload-dialog/upload-dialog.component.ts
+// upload-dialog.component.ts
+// Handles picking a file and uploading it with progress indicator.
+// Emits (uploaded) when upload completes successfully.
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
+import { HttpEventType, HttpEvent } from '@angular/common/http';
 import { DocumentService } from '../../../core/services/document.service';
 
 @Component({
@@ -13,29 +17,47 @@ import { DocumentService } from '../../../core/services/document.service';
 export class UploadDialogComponent {
   selected?: File;
   uploading = false;
+  uploadProgress = 0;
 
   @Output() uploaded = new EventEmitter<void>();
 
   constructor(private svc: DocumentService) {}
 
-  onFilePicked(e: any) {
-    const f = e.target.files && e.target.files[0];
+  onFilePicked(e: Event | any) {
+    const f = e?.target?.files && e.target.files[0];
     if (f) this.selected = f;
+    else this.selected = undefined;
   }
 
+  // Use uploadWithProgress to show progress events
   upload() {
-    if (!this.selected) return;
+    if (!this.selected || this.uploading) return;
+
     this.uploading = true;
-    this.svc.upload(this.selected).subscribe({
-      next: () => {
+    this.uploadProgress = 0;
+
+    this.svc.uploadWithProgress(this.selected).pipe(
+      finalize(() => {
         this.uploading = false;
-        this.selected = undefined;
-        this.uploaded.emit();
+        this.uploadProgress = 0;
+      })
+    ).subscribe({
+      next: (event: HttpEvent<any>) => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this.uploadProgress = Math.round(100 * (event.loaded / event.total));
+        }
+        if (event.type === HttpEventType.Response) {
+          // Upload finished successfully
+          this.selected = undefined;
+          this.uploaded.emit();
+        }
       },
       error: (err) => {
         console.error('Upload failed', err);
-        this.uploading = false;
+        alert('Upload failed: ' + (err?.statusText || err?.message || 'unknown'));
       }
     });
   }
 }
+
+

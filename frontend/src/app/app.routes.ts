@@ -1,10 +1,11 @@
-import { Routes } from '@angular/router';
+// app.routes.ts
+// Root route configuration: lazy-load the Home component (standalone).
+import { Route } from '@angular/router';
 
-export const routes: Routes = [
+export const routes: Route[] = [
   {
     path: '',
-    loadComponent: async () => {
-      const m = await import("./pages/home/home.component");
-      return m.HomeComponent;
-    }
-  }];
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent)
+  }
+];
+

@@ -1,6 +1,7 @@
-// src/app/core/services/document.service.ts
+// document.service.ts
+// HTTP client that matches the Django backend API at /api/documents/
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DocumentDto {
@@ -15,8 +16,8 @@ export interface DocumentDto {
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
-  // Use full URL or '/api/documents/' if using Angular proxy
-  private base = 'http://127.0.0.1:8000/api/documents/';
+  // Use relative path so the Angular proxy forwards to the Django backend.
+  private base = '/api/documents/';
 
   constructor(private http: HttpClient) {}
 
@@ -24,23 +25,28 @@ export class DocumentService {
     return this.http.get<DocumentDto[]>(this.base);
   }
 
-  get(id: string) {
+  get(id: string): Observable<DocumentDto> {
     return this.http.get<DocumentDto>(`${this.base}${id}/`);
   }
 
-  delete(id: string) {
-    return this.http.delete(`${this.base}${id}/`);
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}${id}/`);
   }
 
-  upload(file: File) {
+  // Simple upload — returns the created DocumentDto
+  upload(file: File): Observable<DocumentDto> {
     const fd = new FormData();
     fd.append('file', file, file.name);
     return this.http.post<DocumentDto>(this.base, fd);
   }
 
-  // optional search endpoint (if your backend provides it)
-  search(q: string) {
-    const url = `${this.base}search/?q=${encodeURIComponent(q)}`;
-    return this.http.get<DocumentDto[]>(url);
+  // Upload with progress — useful for showing a progress bar
+  uploadWithProgress(file: File): Observable<HttpEvent<DocumentDto>> {
+    const fd = new FormData();
+    fd.append('file', file, file.name);
+    return this.http.post<DocumentDto>(this.base, fd, {
+      reportProgress: true,
+      observe: 'events'
+    });
   }
 }

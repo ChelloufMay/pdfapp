@@ -1,4 +1,5 @@
-// src/app/app.component.ts
+// app.component.ts
+// Root standalone shell: contains the router outlet.
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 

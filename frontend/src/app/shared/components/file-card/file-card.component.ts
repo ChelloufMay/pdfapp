@@ -1,22 +1,23 @@
 // src/app/shared/components/file-card/file-card.component.ts
+// file-card.component.ts
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { DocumentDto } from '../../../core/services/document.service';
-import {DecimalPipe} from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-file-card',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './file-card.component.html',
-  imports: [
-    DecimalPipe
-  ],
   styleUrls: ['./file-card.component.scss']
 })
 export class FileCardComponent {
   @Input() doc!: DocumentDto;
   @Output() deleted = new EventEmitter<string>();
 
-  onDelete() { this.deleted.emit(this.doc.id); }
+  onDelete() {
+    this.deleted.emit(this.doc.id);
+  }
 
   mimeLabel() {
     if (!this.doc.contentType) return 'File';

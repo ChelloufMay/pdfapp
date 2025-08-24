@@ -1,4 +1,6 @@
-// src/app/shared/components/header/header.component.ts
+// header.component.ts
+// Top header: title, upload control and search input.
+// It's standalone and imports the UploadDialogComponent so <app-upload-dialog> is usable.
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +24,6 @@ export class HeaderComponent {
     this.search.emit(this.query?.trim());
   }
 
-  // forward event when upload completes
   onUploaded() {
     this.uploadedEvent.emit();
   }

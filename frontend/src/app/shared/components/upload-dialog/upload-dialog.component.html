@@ -1,7 +1,14 @@
-<label class="upload-control">
-  <input type="file" (change)="onFilePicked($event)" />
-  <span>{{ selected?.name }}</span>
+<div class="upload-control">
+  <input type="file" (change)="onFilePicked($event)" [disabled]="uploading" />
+  <span class="filename" *ngIf="selected">{{ selected.name }}</span>
+
   <button (click)="upload()" [disabled]="!selected || uploading">
-    {{ uploading ? 'Envoi...' : 'Ajouter' }}
+    <ng-container *ngIf="uploading; else notUploading">Uploading... {{ uploadProgress }}%</ng-container>
+    <ng-template #notUploading>Upload</ng-template>
   </button>
-</label>
+</div>
+
+<!-- Progress bar -->
+<div *ngIf="uploading" class="progress">
+  <progress [value]="uploadProgress" max="100"></progress>
+</div>

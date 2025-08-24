@@ -1,85 +1,37 @@
-/* file-card.component.scss
-   Card styling for document tiles (thumbnail, title, meta, actions).
-*/
+.card { padding:12px;
+  border-radius:10px;
+  background:white;
+  border:1px solid #e6f0ff;
+  display:flex;
+  flex-direction:column;
+  gap:8px; }
 
-:host { display: block; }
-
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #e9f0ff;
-  box-shadow: 0 6px 18px rgba(20,40,80,0.03);
-  transition: transform .12s ease, box-shadow .12s ease;
-  height: 100%;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 28px rgba(20,40,80,0.06);
-}
-
-.thumb {
-  height: 110px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #fbfeff, #f3f9ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #2b4b76;
-  font-size: 18px;
-  overflow: hidden;
-}
-
-.body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1 1 auto;
-}
-
-.title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #18314f;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.meta {
-  font-size: 12px;
-  color: #6b7f99;
-}
-
-.actions {
+.thumb { height:90px;
   display:flex;
   align-items:center;
+  justify-content:center;
+  background:#f7fbff;
+  border-radius:6px;
+  font-weight:700;
+  color:#123; }
+
+.title { font-weight:600;
+  color:#123;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis; }
+
+.meta { color:#6b7f99;
+  font-size:12px; }
+
+.actions { display:flex;
+  gap:10px;
   justify-content:space-between;
-  gap: 8px;
-  margin-top: auto;
-}
+  align-items:center; }
 
-.actions a,
-.actions button {
-  border: none;
-  background: transparent;
-  color: #2f6fff;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-}
+.actions a { color:#2f6fff;
+  text-decoration:none;
+  font-weight:600; }
 
-.actions button {
-  color: #ff4d4f;
-}
-
-@media (max-width: 600px) {
-  .thumb { height: 90px; font-size: 16px; }
-  .title { font-size: 14px; }
-}
+.actions button { color:#ff4d4f; background:transparent; border:none; cursor:pointer; font-weight:600; }
 

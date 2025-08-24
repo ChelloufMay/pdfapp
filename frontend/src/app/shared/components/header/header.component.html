@@ -4,10 +4,11 @@
   </div>
 
   <div class="controls">
-    <!-- Upload dialog component emits (uploaded) when upload completes -->
+    <!-- Upload dialog (child) -->
     <app-upload-dialog (uploaded)="onUploaded()"></app-upload-dialog>
 
-    <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Recherche ..." />
-    <button (click)="onSearch()">Rechercher</button>
+    <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Search..." />
+    <button (click)="onSearch()">Search</button>
   </div>
 </header>
+

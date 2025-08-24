@@ -1,91 +1,69 @@
 # documents/utils/extractors.py
-import io
-from pdfminer.high_level import extract_text
-from PyPDF2 import PdfReader
-from PyPDF2.errors import PdfReadError
+# documents/utils/extractors.py
+"""
+Text extraction utility. Tries to extract with PyPDF2 first (works for text PDFs).
+If no text or extraction fails and pytesseract is available + tesseract installed,
+it will run OCR on each PDF page rendered as an image (requires pdf2image/pillow/pyocr).
+This implementation keeps dependencies optional.
+"""
 
-# Optional OCR imports may not be available — import lazily
-try:
-    from pdf2image import convert_from_bytes
-    import pytesseract
-    OCR_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
-    OCR_AVAILABLE = False
+from typing import Optional
 
-
-def extract_text_from_pdf(file_path=None, file_bytes=None):
+def extract_text_from_pdf(file_path: Optional[str] = None, file_bytes: Optional[bytes] = None) -> str:
     text = ''
-
-    # 1) pdfminer extraction (works with file-like objects)
+    # prefer file_path when available
     try:
-        if file_bytes:
-            text = extract_text(io.BytesIO(file_bytes))
-        else:
-            text = extract_text(file_path)
-        if text and text.strip():
-            return text
-    except (OSError, IOError) as err:
-        # File I/O problems
-        # You may log the error here: logger.exception("pdfminer I/O error")
-        pass
-    except Exception:
-        # pdfminer can raise library-specific errors; for safety we fallback to PyPDF2
-        # We avoid re-raising so extraction can continue to other methods.
-        pass
-
-    # 2) PyPDF2 fallback (page-by-page text extraction)
-    try:
-        if file_bytes:
-            reader = PdfReader(io.BytesIO(file_bytes))
-        else:
-            with open(file_path, 'rb') as f:
-                reader = PdfReader(f)
-
-        pages_text = []
-        for p in reader.pages:
-            # PdfReadError can be raised when reading malformed pages
-            try:
-                pages_text.append(p.extract_text() or '')
-            except PdfReadError:
-                pages_text.append('')
-            except Exception:
-                # If extraction for a page fails, skip it
-                pages_text.append('')
-        text = "\n".join(pages_text).strip()
-        if text:
-            return text
-    except PdfReadError:
-        # corrupted PDF structure; fall through to OCR (if available)
-        pass
-    except (OSError, IOError):
-        # file I/O problems, fallthrough
-        pass
-    except Exception:
-        # Unexpected errors — fallback to OCR if available
-        pass
-
-    # 3) OCR fallback — only attempt if OCR libs are installed
-    if OCR_AVAILABLE:
-        try:
-            images = convert_from_bytes(file_bytes if file_bytes else open(file_path, 'rb').read())
-            text_parts = []
-            for img in images:
-                # pytesseract can raise TesseractNotFoundError if tesseract is not installed
+        from PyPDF2 import PdfReader
+        reader = None
+        if file_path:
+            reader = PdfReader(file_path)
+        elif file_bytes:
+            from io import BytesIO
+            reader = PdfReader(BytesIO(file_bytes))
+        if reader:
+            pages = []
+            for p in reader.pages:
                 try:
-                    text_parts.append(pytesseract.image_to_string(img))
-                except (RuntimeError, OSError):
-                    # OCR failed for this image — skip it
-                    text_parts.append('')
+                    pages.append(p.extract_text() or '')
                 except Exception:
-                    text_parts.append('')
-            text = "\n".join(text_parts).strip()
-            return text
-        except (OSError, IOError):
-            # problems reading images / poppler missing
-            pass
-        except Exception:
-            # any other exception — give up gracefully
-            pass
+                    pages.append('')
+            text = '\n'.join(pages).strip()
+    except Exception:
+        # PyPDF2 not available or extraction failed — continue to other methods
+        text = ''
 
-    # Nothing extracted
-    return ''
+    if text:
+        return text
+
+    # Optional: try pdfminer
+    try:
+        from io import BytesIO
+        from pdfminer.high_level import extract_text as pdfminer_extract_text
+        if file_path:
+            text = pdfminer_extract_text(file_path) or ''
+        elif file_bytes:
+            text = pdfminer_extract_text(BytesIO(file_bytes)) or ''
+    except Exception:
+        text = ''
+
+    if text:
+        return text
+
+    # Optional OCR fallback (slow): requires tesseract & pdf2image & pytesseract
+    try:
+        import pytesseract
+        from pdf2image import convert_from_path, convert_from_bytes
+        images = []
+        if file_path:
+            images = convert_from_path(file_path, dpi=200)
+        elif file_bytes:
+            images = convert_from_bytes(file_bytes, dpi=200)
+        ocr_texts = []
+        for img in images:
+            ocr_texts.append(pytesseract.image_to_string(img))
+        text = '\n'.join(ocr_texts).strip()
+    except Exception:
+        # OCR failed or libs not installed
+        text = ''
+
+    return text or ''
