@@ -1,4 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.scss — global look & feel to match the screenshot */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+:root {
+  --bg: #eaf3fb;
+  --panel: #f7f9ff;
+  --accent: #5b6cff;
+  --muted: #6b7f99;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: linear-gradient(180deg, #f1f6fb 0%, var(--bg) 100%);
+  color: #122236;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add container constraints */
+.container {
+  width: min(1200px, 94%);
+  margin: 18px auto;
+}
+
+/* small utility */
+.kv-muted { color: var(--muted); font-size: 12px; }
+

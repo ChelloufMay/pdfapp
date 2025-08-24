@@ -1,11 +1,15 @@
 <div class="card">
-  <div class="thumb">{{ mimeLabel() }}</div>
+  <div class="thumb"></div>
   <div class="body">
     <div class="title">{{ doc.fileName }}</div>
-    <div class="meta">{{ doc.contentType || 'Unknown' }} • {{ (doc.fileSize/1024) | number:'1.0-0' }} KB</div>
-    <div class="actions">
-      <a [href]="doc.fileUrl" target="_blank" rel="noopener">Open</a>
-      <button (click)="onDelete()">Delete</button>
+    <div class="meta">{{ mimeLabel() }}</div>
+    <div class="size kv-muted">{{ (doc.fileSize/1024) | number:'1.0-2' }} KB</div>
+
+    <div class="card-actions">
+      <button (click)="onOpen()">Open</button>
+      <button (click)="onViewExtracted()">View</button>
+      <button (click)="onDownload()">Download</button>
+      <button (click)="onDelete()" class="delete">Delete</button>
     </div>
   </div>
 </div>

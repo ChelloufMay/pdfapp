@@ -1,14 +1,25 @@
-<header class="app-header">
+<div class="header-pill container">
   <div class="left">
-    <h1>{{ title }}</h1>
+    <div class="logo">DocuVault</div>
   </div>
 
   <div class="controls">
-    <!-- Upload dialog (child) -->
+    <!-- Upload dialog sits inline -->
     <app-upload-dialog (uploaded)="onUploaded()"></app-upload-dialog>
 
-    <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Search..." />
-    <button (click)="onSearch()">Search</button>
+    <!-- simple dropdown look (not wired to anything now) -->
+    <button class="chip">Dossier</button>
+    <select class="chip">
+      <option>Date</option>
+    </select>
+    <select class="chip">
+      <option>Type</option>
+    </select>
+
+    <div class="search">
+      <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Recherche ......" />
+      <button class="search-btn" (click)="onSearch()">🔍</button>
+    </div>
   </div>
-</header>
+</div>
 

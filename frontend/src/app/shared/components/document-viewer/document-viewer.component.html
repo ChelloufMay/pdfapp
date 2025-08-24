@@ -1,0 +1,25 @@
+<div class="overlay" *ngIf="visible">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>{{ doc?.fileName }}</h3>
+      <button class="close" (click)="close()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <h4>Extracted text</h4>
+      <pre class="extracted">{{ doc?.data || 'No extracted text available.' }}</pre>
+
+      <h4>Original file</h4>
+      <div *ngIf="doc?.fileUrl">
+        <a [href]="doc?.fileUrl" target="_blank" rel="noopener">Open original in new tab</a>
+        <br/>
+        <a [href]="doc?.fileUrl" target="_blank" rel="noopener" download>Download original</a>
+      </div>
+      <div *ngIf="!doc?.fileUrl">Original file not available.</div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="close()">Close</button>
+    </div>
+  </div>
+</div>

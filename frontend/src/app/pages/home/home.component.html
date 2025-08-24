@@ -1,15 +1,25 @@
-<app-header (search)="onSearch($event)" (uploadedEvent)="onUploaded()"></app-header>
+<div class="container app-shell">
+  <app-header (search)="onSearch($event)" (uploadedEvent)="onUploaded()"></app-header>
 
-<div *ngIf="pageDocs && pageDocs.length > 0" class="grid">
-  <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDelete($event)"></app-file-card>
-</div>
+  <h3 style="margin-top:18px; color:#2b4a78;">Fichiers</h3>
 
-<div *ngIf="!pageDocs || pageDocs.length === 0" class="empty">
-  <p>No documents found.</p>
-</div>
+  <div class="grid">
+    <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDelete($event)" (view)="openViewer($event)"></app-file-card>
+  </div>
 
-<div class="pager">
-  <button (click)="pagePrev()" [disabled]="pageIndex === 0">‹ Prev</button>
-  <span>Page {{ pageIndex + 1 }} / {{ totalPages }}</span>
-  <button (click)="pageNext()" [disabled]="(pageIndex + 1) * pageSize >= docs.length">Next ›</button>
+  <div class="pager">
+    <div class="items-per">Items per page:
+      <select [(ngModel)]="pageSize" (change)="updatePage()">
+        <option>6</option><option>12</option><option>15</option><option>24</option>
+      </select>
+    </div>
+
+    <div class="page-controls">
+      <button (click)="pagePrev()" [disabled]="pageIndex===0">‹</button>
+      <span>{{ pageIndex + 1 }} / {{ totalPages }}</span>
+      <button (click)="pageNext()" [disabled]="(pageIndex+1)*pageSize>=docs.length">›</button>
+    </div>
+  </div>
+
+  <app-document-viewer [doc]="viewerDoc" [visible]="viewerVisible" (closed)="closeViewer()"></app-document-viewer>
 </div>

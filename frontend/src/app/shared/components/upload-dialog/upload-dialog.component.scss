@@ -1,14 +1,8 @@
-.upload-control { display:flex; gap:8px;
-  align-items:center; }
-
-.filename { max-width:200px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap; }
-
-button[disabled] { opacity:0.6;
-  cursor:default; }
-
-.progress { margin-top:6px;
-  width:260px; }
-
+.upload-wrapper { display:flex; gap:10px; align-items:center; }
+.upload-button {
+  display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px;
+  background: white; border:1px solid rgba(0,0,0,0.04); cursor:pointer;
+}
+.upload-button input { display:none; }
+.primary-btn { background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
+.file-name { font-size:13px; color:var(--muted); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
