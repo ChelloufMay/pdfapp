@@ -1,28 +1,46 @@
+<!-- document-viewer.component.html -->
 <div class="overlay" *ngIf="visible">
   <div class="modal">
     <div class="modal-header">
       <h3>{{ doc?.fileName }}</h3>
       <div>
-        <button (click)="copyText()" class="chip">Copy text</button>
-        <button (click)="close()" class="chip">Close</button>
+        <button class="chip" (click)="copyKeywordsToClipboard()">Copy keywords</button>
+        <button class="chip" (click)="close()">Close</button>
       </div>
     </div>
 
     <div class="modal-body">
-      <section class="extracted">
-        <h4>Extracted text</h4>
-        <pre>{{ doc?.data || 'No extracted text available.' }}</pre>
+      <section class="keywords">
+        <h4>Top keywords</h4>
+
+        <div *ngIf="keywordsList && keywordsList.length; else noKeywords">
+          <div *ngFor="let k of keywordsList" class="keyword-row">
+            <div class="kw-left">
+              <span class="kw-word">{{ k.word }}</span>
+              <span class="kv-muted">({{ k.count }})</span>
+            </div>
+            <div class="kw-right">
+              <div class="kw-bar-bg">
+                <div class="kw-bar" [style.width.%]="k.percent"></div>
+              </div>
+              <div class="kw-pct">{{ k.percent }}%</div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noKeywords>
+          <div class="kv-muted">No keywords available for this file.</div>
+        </ng-template>
       </section>
 
-      <section style="margin-top:12px;">
+      <section style="margin-top:14px;">
         <h4>Original file</h4>
         <div *ngIf="doc?.fileUrl">
-          • <a [href]="doc?.fileUrl" target="_blank">Open original</a> <br>
-          • <a [href]="doc?.fileUrl" target="_blank" download>Download original</a>
+          • <a [href]="doc?.fileUrl" target="_blank" rel="noopener">Open original</a> <br>
+          • <a [href]="doc?.fileUrl" target="_blank" rel="noopener" download>Download original</a>
         </div>
         <div *ngIf="!doc?.fileUrl">Original file not available.</div>
       </section>
     </div>
   </div>
 </div>
-

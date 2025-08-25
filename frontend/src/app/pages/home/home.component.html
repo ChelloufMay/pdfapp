@@ -1,16 +1,29 @@
 <div class="container">
-  <app-header [dates]="dates" [types]="types" (search)="onSearch($event)" (filterChanged)="onFilterChanged($event)" (uploadedEvent)="onUploaded()"></app-header>
+  <app-header
+    [dates]="dates"
+    [types]="types"
+    (search)="onSearch($event)"
+    (filterChanged)="onFilterChanged($event)"
+    (uploadedEvent)="onUploaded()"
+  ></app-header>
 
   <h3 style="margin-top:18px; color:#2b4a78;">Files</h3>
 
   <div class="grid">
-    <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDeleteRequest($event)" (view)="openViewer($event)"></app-file-card>
+    <app-file-card
+      *ngFor="let d of pageDocs"
+      [doc]="d"
+      (deleted)="onDeleteRequest($event)"
+      (view)="openViewer($event)"
+    ></app-file-card>
   </div>
 
   <div class="pager">
     <div>
       Items per page:
-      <select [(ngModel)]="pageSize" (change)="updatePage()"><option>6</option><option>12</option><option>15</option><option>24</option></select>
+      <select [(ngModel)]="pageSize" (change)="updatePage()">
+        <option>6</option><option>12</option><option>15</option><option>24</option>
+      </select>
     </div>
 
     <div>
@@ -20,14 +33,18 @@
     </div>
   </div>
 
-  <app-document-viewer [doc]="viewerDoc" [visible]="viewerVisible" (closed)="closeViewer()"></app-document-viewer>
+  <app-document-viewer
+    [doc]="viewerDoc"
+    [visible]="viewerVisible"
+    (closed)="closeViewer()"
+  ></app-document-viewer>
 
   <!-- confirmation dialog -->
   <app-confirm-dialog
     [visible]="confirmVisible"
     [title]="'Delete file'"
-    [message]="'Are you sure you want to permanently delete \"' + (confirmTargetName || '') + '\" ?'"
-  (confirmed)="confirmDelete()"
-  (cancelled)="closeConfirm()"
+    [message]="confirmMessage"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeConfirm()"
   ></app-confirm-dialog>
 </div>

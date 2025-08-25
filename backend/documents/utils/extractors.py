@@ -1,69 +1,38 @@
 # documents/utils/extractors.py
-# documents/utils/extractors.py
-"""
-Text extraction utility. Tries to extract with PyPDF2 first (works for text PDFs).
-If no text or extraction fails and pytesseract is available + tesseract installed,
-it will run OCR on each PDF page rendered as an image (requires pdf2image/pillow/pyocr).
-This implementation keeps dependencies optional.
-"""
-
 from typing import Optional
+import io
 
 def extract_text_from_pdf(file_path: Optional[str] = None, file_bytes: Optional[bytes] = None) -> str:
-    text = ''
-    # prefer file_path when available
+    """
+    Basic PDF text extraction using PyPDF2.
+    Returns extracted text as a string (may be empty for scanned PDFs).
+    """
     try:
         from PyPDF2 import PdfReader
+    except Exception:
+        # PyPDF2 not installed
+        return ''
+
+    try:
         reader = None
-        if file_path:
-            reader = PdfReader(file_path)
-        elif file_bytes:
-            from io import BytesIO
-            reader = PdfReader(BytesIO(file_bytes))
-        if reader:
-            pages = []
-            for p in reader.pages:
-                try:
-                    pages.append(p.extract_text() or '')
-                except Exception:
-                    pages.append('')
-            text = '\n'.join(pages).strip()
+        if file_bytes:
+            stream = io.BytesIO(file_bytes)
+            reader = PdfReader(stream)
+        elif file_path:
+            with open(file_path, 'rb') as f:
+                reader = PdfReader(f)
+        else:
+            return ''
+
+        text_parts = []
+        for page in reader.pages:
+            try:
+                text = page.extract_text() or ''
+            except Exception:
+                text = ''
+            if text:
+                text_parts.append(text)
+        return "\n".join(text_parts)
     except Exception:
-        # PyPDF2 not available or extraction failed — continue to other methods
-        text = ''
-
-    if text:
-        return text
-
-    # Optional: try pdfminer
-    try:
-        from io import BytesIO
-        from pdfminer.high_level import extract_text as pdfminer_extract_text
-        if file_path:
-            text = pdfminer_extract_text(file_path) or ''
-        elif file_bytes:
-            text = pdfminer_extract_text(BytesIO(file_bytes)) or ''
-    except Exception:
-        text = ''
-
-    if text:
-        return text
-
-    # Optional OCR fallback (slow): requires tesseract & pdf2image & pytesseract
-    try:
-        import pytesseract
-        from pdf2image import convert_from_path, convert_from_bytes
-        images = []
-        if file_path:
-            images = convert_from_path(file_path, dpi=200)
-        elif file_bytes:
-            images = convert_from_bytes(file_bytes, dpi=200)
-        ocr_texts = []
-        for img in images:
-            ocr_texts.append(pytesseract.image_to_string(img))
-        text = '\n'.join(ocr_texts).strip()
-    except Exception:
-        # OCR failed or libs not installed
-        text = ''
-
-    return text or ''
+        # Extraction failed — return empty string (caller should handle)
+        return ''
