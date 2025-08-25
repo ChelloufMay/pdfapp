@@ -1,13 +1,21 @@
+// document.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
+export interface KeywordDto {
+  word: string;
+  count: number;
+  percent: number;
+}
+
 export interface DocumentDto {
   id: string;
   fileName: string;
   creationDate: string;
-  data: string;
+  // data now is an array of keywords
+  data?: KeywordDto[] | string; // keep string allowed (defensive)
   fileUrl: string;
   fileSize: number;
   contentType: string;
@@ -44,8 +52,7 @@ export class DocumentService {
   uploadWithProgress(file: File): Observable<HttpEvent<DocumentDto>> {
     const fd = new FormData();
     fd.append('file', file, file.name);
-    return this.http.post<DocumentDto>(this.base, fd, { reportProgress:true, observe:'events' });
+    return this.http.post<DocumentDto>(this.base, fd, { reportProgress: true, observe: 'events' });
   }
   downloadEndpoint(id: string) { return `/api/documents/${id}/download/`; }
 }
-

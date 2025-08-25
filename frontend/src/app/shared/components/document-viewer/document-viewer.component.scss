@@ -30,6 +30,7 @@
 .modal-body {
   margin-top:10px;
 }
+/*
 .extracted pre {
   background:#f7fbff;
   padding:12px;
@@ -38,6 +39,42 @@
   max-height:50vh;
   overflow:auto;
 }
+*/
+/* keywords list */
+.keyword-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px; margin-bottom:10px;
+}
+
+.kw-left {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  min-width:120px;
+}
+.kw-word {
+  font-weight:700;
+  text-transform:lowercase;
+}
+.kw-right {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:320px;
+  max-width:60%;
+}
+.kw-bar-bg {
+  flex:1;
+  background:#eef6ff;
+  height:10px;
+  border-radius:6px; overflow:hidden; }
+.kw-bar { height:100%; background: linear-gradient(90deg,#4b6bff,#6da1ff); }
+.kw-pct { width:44px; text-align:right; font-size:13px; color:#234; }
+
+.kv-muted { color:#6b7f99; font-size:13px; }
+
 .chip {
   padding:6px 10px;
   border-radius:8px;

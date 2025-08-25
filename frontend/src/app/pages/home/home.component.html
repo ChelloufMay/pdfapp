@@ -1,4 +1,5 @@
 <div class="container">
+  <!-- Header: search, filters, upload -->
   <app-header
     [dates]="dates"
     [types]="types"
@@ -9,6 +10,7 @@
 
   <h3 style="margin-top:18px; color:#2b4a78;">Files</h3>
 
+  <!-- Grid of file cards -->
   <div class="grid">
     <app-file-card
       *ngFor="let d of pageDocs"
@@ -18,28 +20,33 @@
     ></app-file-card>
   </div>
 
+  <!-- Pager / controls -->
   <div class="pager">
     <div>
       Items per page:
       <select [(ngModel)]="pageSize" (change)="updatePage()">
-        <option>6</option><option>12</option><option>15</option><option>24</option>
+        <option>6</option>
+        <option>12</option>
+        <option>15</option>
+        <option>24</option>
       </select>
     </div>
 
     <div>
-      <button (click)="pagePrev()" [disabled]="pageIndex===0">‹</button>
-      <span>{{ pageIndex+1 }} / {{ totalPages }}</span>
-      <button (click)="pageNext()" [disabled]="(pageIndex+1)*pageSize>=docs.length">›</button>
+      <button (click)="pagePrev()" [disabled]="pageIndex === 0">‹</button>
+      <span>{{ pageIndex + 1 }} / {{ totalPages }}</span>
+      <button (click)="pageNext()" [disabled]="(pageIndex + 1) * pageSize >= docs.length">›</button>
     </div>
   </div>
 
+  <!-- Viewer modal -->
   <app-document-viewer
     [doc]="viewerDoc"
     [visible]="viewerVisible"
     (closed)="closeViewer()"
   ></app-document-viewer>
 
-  <!-- confirmation dialog -->
+  <!-- Confirmation dialog (styled) -->
   <app-confirm-dialog
     [visible]="confirmVisible"
     [title]="'Delete file'"

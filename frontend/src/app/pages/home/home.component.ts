@@ -1,7 +1,11 @@
 // frontend/src/app/pages/home/home.component.ts
+// Home view: loads documents, supports search/filters, viewer and a styled confirm dialog.
+// This file includes a safe `confirmMessage` getter used by the template.
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { DocumentService, DocumentDto } from '../../core/services/document.service';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { FileCardComponent } from '../../shared/components/file-card/file-card.component';
@@ -54,43 +58,80 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  populateFilterLists() {
+  populateFilterLists(){
     const dset = new Set<string>();
     const tset = new Set<string>();
-    for (const d of this.docs) {
-      if (d.creationDate) dset.add(d.creationDate.split('T')[0]);
+    for(const d of this.docs){
+      if(d.creationDate){
+        dset.add(d.creationDate.split('T')[0]);
+      }
       const m = (d.contentType || '').toLowerCase();
-      if (m.includes('pdf')) tset.add('PDF');
-      else if (m.includes('image')) tset.add('Image');
-      else if (m.includes('word') || m.includes('officedocument') || m.includes('msword')) tset.add('Document');
-      else if (m) tset.add('Other');
+      if(m.includes('pdf')) tset.add('PDF');
+      else if(m.includes('image')) tset.add('Image');
+      else if(m.includes('word') || m.includes('officedocument') || m.includes('msword')) tset.add('Document');
+      else if(m) tset.add('Other');
     }
-    this.dates = Array.from(dset).sort((a, b) => b.localeCompare(a));
+    this.dates = Array.from(dset).sort((a,b)=>b.localeCompare(a));
     this.types = Array.from(tset).sort();
   }
 
-  // header handlers
-  onSearch(q: string) { this.query = q || ''; this.applyFilters(); }
-  onFilterChanged(f: { date: string, type: string }) { this.appliedDate = f.date; this.appliedType = f.type; this.applyFilters(); }
-  onUploaded() { this.load(); }
+  // HEADER EVENTS
+  onSearch(q: string){ this.query = q || ''; this.applyFilters(); }
+  onFilterChanged(f:{date:string,type:string}){ this.appliedDate = f.date; this.appliedType = f.type; this.applyFilters(); }
+  onUploaded(){ this.load(); }
 
-  applyFilters() {
+  /**
+   * Normalize Document.data to a single string used for searching.
+   * Handles KeywordDto[] or string safely.
+   */
+  private dataText(d: DocumentDto): string {
+    const raw = (d as any).data;
+    if (!raw) return '';
+
+    if (Array.isArray(raw)) {
+      try {
+        const words = raw.map((k: any) => {
+          if (!k) return '';
+          if (typeof k === 'string') return k;
+          if ('word' in k && k.word) return String(k.word);
+          const vals = Object.values(k);
+          return vals.length ? String(vals[0]) : '';
+        }).filter(Boolean);
+        return words.join(' ');
+      } catch (e) {
+        return '';
+      }
+    }
+
+    if (typeof raw === 'string') return raw;
+    try { return String(raw); } catch (e) { return ''; }
+  }
+
+  applyFilters(){
+    const qRaw = (this.query || '').trim();
+    const q = qRaw.toLowerCase();
+
     let filtered = this.docs.slice();
 
-    if (this.query) {
-      const q = this.query.toLowerCase();
-      filtered = filtered.filter(d => (d.data || '').toLowerCase().includes(q) || (d.fileName || '').toLowerCase().includes(q));
+    if(q){
+      filtered = filtered.filter(d => {
+        const dataText = this.dataText(d).toLowerCase();
+        const nameText = (d.fileName || '').toLowerCase();
+        return dataText.includes(q) || nameText.includes(q);
+      });
     }
-    if (this.appliedDate) {
+
+    if(this.appliedDate){
       filtered = filtered.filter(d => d.creationDate && d.creationDate.startsWith(this.appliedDate));
     }
-    if (this.appliedType) {
+
+    if(this.appliedType){
       filtered = filtered.filter(d => {
         const m = (d.contentType || '').toLowerCase();
-        if (this.appliedType === 'PDF') return m.includes('pdf');
-        if (this.appliedType === 'Image') return m.includes('image');
-        if (this.appliedType === 'Document') return m.includes('word') || m.includes('officedocument') || m.includes('msword');
-        if (this.appliedType === 'Other') return !!m && !m.includes('pdf') && !m.includes('image') && !m.includes('word') && !m.includes('officedocument');
+        if(this.appliedType === 'PDF') return m.includes('pdf');
+        if(this.appliedType === 'Image') return m.includes('image');
+        if(this.appliedType === 'Document') return m.includes('word') || m.includes('officedocument') || m.includes('msword');
+        if(this.appliedType === 'Other') return !!m && !m.includes('pdf') && !m.includes('image') && !m.includes('word') && !m.includes('officedocument');
         return true;
       });
     }
@@ -99,58 +140,49 @@ export class HomeComponent implements OnInit {
     this.pageDocs = filtered.slice(0, this.pageSize);
   }
 
-  updatePage() {
-    if (!Array.isArray(this.docs) || this.docs.length === 0) { this.pageDocs = []; return; }
+  updatePage(){
+    if(!Array.isArray(this.docs) || this.docs.length === 0){ this.pageDocs = []; return; }
     const start = this.pageIndex * this.pageSize;
     this.pageDocs = this.docs.slice(start, start + this.pageSize);
   }
 
-  // show confirm dialog
-  onDeleteRequest(id: string) {
+  // show confirm dialog (called by file-card delete event)
+  onDeleteRequest(id: string){
     this.confirmTargetId = id;
     const doc = this.docs.find(d => d.id === id);
     this.confirmTargetName = doc ? doc.fileName : '';
     this.confirmVisible = true;
   }
 
-  // confirmMessage is bound in the template to avoid complex template expressions
+  // simple getter used by template to avoid complex inline expressions
   get confirmMessage(): string {
     const name = this.confirmTargetName || '';
-    return `Are you sure you want to permanently delete "${name}"?`;
+    return name ? `Are you sure you want to permanently delete "${name}"?` : 'Are you sure you want to delete this file?';
   }
 
-  // called when user confirms in the dialog
-  confirmDelete() {
+  // called when user confirms deletion in the confirm dialog
+  confirmDelete(){
     const id = this.confirmTargetId;
-    if (!id) {
-      this.closeConfirm();
-      return;
-    }
+    if (!id) { this.closeConfirm(); return; }
     this.svc.delete(id).subscribe({
-      next: () => {
-        this.closeConfirm();
-        this.load();
-      },
-      error: (err) => {
-        console.error('delete error', err);
-        alert('Failed to delete the file.');
-        this.closeConfirm();
-      }
+      next: () => { this.closeConfirm(); this.load(); },
+      error: (err) => { console.error('delete error', err); alert('Failed to delete the file.'); this.closeConfirm(); }
     });
   }
 
-  closeConfirm() {
+  closeConfirm(){
     this.confirmVisible = false;
     this.confirmTargetId = null;
     this.confirmTargetName = '';
   }
 
-  openViewer(doc: DocumentDto) { this.viewerDoc = doc; this.viewerVisible = true; }
-  closeViewer() { this.viewerVisible = false; this.viewerDoc = undefined; }
+  openViewer(doc: DocumentDto){ this.viewerDoc = doc; this.viewerVisible = true; }
+  closeViewer(){ this.viewerVisible = false; this.viewerDoc = undefined; }
 
-  pageNext() { if (this.pageIndex < this.totalPages - 1) { this.pageIndex++; this.updatePage(); } }
-  pagePrev() { if (this.pageIndex > 0) { this.pageIndex--; this.updatePage(); } }
-  get totalPages() { return Math.max(1, Math.ceil((this.docs?.length || 0) / this.pageSize)); }
+  pageNext(){ if(this.pageIndex < this.totalPages - 1){ this.pageIndex++; this.updatePage(); } }
+  pagePrev(){ if(this.pageIndex > 0){ this.pageIndex--; this.updatePage(); } }
+  get totalPages(){ return Math.max(1, Math.ceil((this.docs?.length || 0)/this.pageSize)); }
 }
+
 
 

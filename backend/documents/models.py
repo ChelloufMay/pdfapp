@@ -4,22 +4,18 @@ import uuid
 import mimetypes
 from django.db import models
 
+
 def upload_to_uploads(instance, filename):
-    """
-    FileField upload path function: MEDIA_ROOT/uploads/<filename>
-    """
     return os.path.join('uploads', filename)
 
 
 class Document(models.Model):
     """
-    Document model representing an uploaded file.
-    NOTE: `data` is a JSONField that stores the extracted keywords list:
+    Document model. NOTE: `data` stores the extracted keywords JSON array:
       data = [
         {"word": "invoice", "count": 8, "percent": 4.0},
         ...
       ]
-    keywords_text is a convenience plain-text field used for simple searches.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -27,15 +23,12 @@ class Document(models.Model):
     fileName = models.CharField(max_length=512, blank=True)
     creationDate = models.DateTimeField(auto_now_add=True)
 
-    # DATA now stores keywords as JSON list (see above)
+    # data is JSONField containing keywords array (replaces raw extracted text)
     data = models.JSONField(null=True, blank=True, help_text="List of keywords and their stats")
 
     # file metadata
     fileSize = models.BigIntegerField(null=True, blank=True)
     contentType = models.CharField(max_length=128, blank=True)
-
-    # convenience field to help text searches (space-separated keyword words)
-    keywords_text = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-creationDate']
@@ -54,19 +47,15 @@ class Document(models.Model):
             return ''
 
     def save(self, *args, **kwargs):
-        """
-        Ensure fileName, fileSize and contentType are filled when saving.
-        This override writes the file first (so file.path is available), then
-        fills derived metadata and writes update_fields if necessary.
-        """
+        # set filename if missing
         if self.file and not self.fileName:
             self.fileName = os.path.basename(self.file.name)
 
-        # call parent to ensure file is written to disk
+        # call parent to ensure file is written to disk first
         super().save(*args, **kwargs)
 
         changed = False
-        # update fileSize if missing
+        # fill fileSize if missing
         if self.file and (self.fileSize is None):
             try:
                 self.fileSize = self.file.size
@@ -74,7 +63,7 @@ class Document(models.Model):
             except Exception:
                 pass
 
-        # update contentType if missing
+        # fill contentType if missing
         if self.file and not self.contentType:
             guessed_type = None
             try:

@@ -7,7 +7,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        # `data` is JSONField (list of keyword dicts)
+        # data is JSONField (list of keyword dicts)
         fields = ['id', 'fileName', 'creationDate', 'data', 'fileUrl', 'fileSize', 'contentType']
 
     def get_fileUrl(self, obj):
