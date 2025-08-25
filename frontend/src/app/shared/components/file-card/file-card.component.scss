@@ -1,19 +1,94 @@
 .card {
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #eef6ff;
-  box-shadow: 0 8px 24px rgba(28,50,90,0.04);
+  background: #ffffff;
+  border-radius:12px;
+  padding:12px;
+  border:1px solid #0e5cb5;
+  box-shadow:0 8px 24px rgba(28,50,90,0.04);
+  position:relative;
   display:flex;
   flex-direction:column;
   gap:8px;
 }
-.thumb { height:120px; border-radius:8px; background: linear-gradient(180deg,#fff,#f4f8ff); }
-.title { font-weight:600; }
-.meta { font-size:13px; color:var(--muted); }
-.size { font-size:12px; }
-.card-actions { display:flex; gap:8px; margin-top:auto; flex-wrap:wrap; }
-.card-actions button { border-radius:8px; padding:6px 10px; border:1px solid rgba(0,0,0,0.04); background:transparent; cursor:pointer; }
-.card-actions .delete { color:#ff4d4f; border-color:#ffecec; }
+
+.menu-btn {
+  position:absolute;
+  top:10px; right:10px;
+  width:28px;
+  height:28px;
+  border-radius:6px;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  color:#50607a;
+}
+.menu {
+  position:absolute;
+  top:40px;
+  right:10px;
+  background:white;
+  border-radius:8px;
+  padding:6px 8px;
+  box-shadow:0 10px 30px rgba(20,40,80,0.08);
+  z-index:1200;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:140px;
+}
+
+.menu-item {
+  padding:8px 10px;
+  font-size:14px;
+  color:#25406a;
+  cursor:pointer;
+  border-radius:6px;
+}
+
+.menu-item:hover {
+  background: rgba(75,107,255,0.06);
+}
+
+.thumb {
+  height:120px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(180deg,#fff, #6699f1);
+  color:#1f3a58;
+  font-weight:700;
+}
+
+.title {
+  font-weight:600;
+  font-size:15px;
+  color:#162336;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.meta {
+  color:#6b7f99;
+  font-size:13px;
+}
+.actions {
+  display:flex;
+  gap:8px; margin-top:auto;
+}
+.text-btn {
+  background:transparent;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  color:#2f6fff;
+  font-weight:600;
+}
+
+.text-btn.delete {
+  color:#ff4d4f;
+}
+
+
 
 

@@ -1,12 +1,16 @@
 <div class="upload-wrapper">
   <label class="upload-button">
     <input type="file" (change)="onFilePicked($event)" [disabled]="uploading" />
-    <span>➕ Ajouter</span>
+    <span>➕ Add file</span>
   </label>
+
   <div class="file-name" *ngIf="selected">{{ selected.name }}</div>
-  <button (click)="upload()" [disabled]="!selected || uploading" class="primary-btn">
+
+  <!-- Upload button (restored replacing Clear) -->
+  <button (click)="upload()" [disabled]="!selected || uploading" class="chip">
     <ng-container *ngIf="!uploading">Upload</ng-container>
     <ng-container *ngIf="uploading">Uploading {{uploadProgress}}%</ng-container>
   </button>
 </div>
+
 

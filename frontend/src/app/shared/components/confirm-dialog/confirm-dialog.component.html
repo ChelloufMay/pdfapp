@@ -1,0 +1,17 @@
+<!-- confirm-dialog.component.html -->
+<div class="overlay" *ngIf="visible" (click)="onCancel()">
+  <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>{{ title }}</h3>
+    </div>
+
+    <div class="modal-body">
+      <p class="message">{{ message }}</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-neutral" (click)="onCancel()">Cancel</button>
+      <button class="btn-danger" (click)="onConfirm()">Delete</button>
+    </div>
+  </div>
+</div>

@@ -14,7 +14,14 @@ export class DocumentViewerComponent {
   @Input() visible = false;
   @Output() closed = new EventEmitter<void>();
 
-  close() {
-    this.closed.emit();
+  copyText() {
+    if (!this.doc?.data) return;
+    navigator.clipboard.writeText(this.doc.data).then(() => {
+      alert('Extracted text copied to clipboard');
+    }, () => {
+      alert('Copy failed');
+    });
   }
+
+  close() { this.closed.emit(); }
 }

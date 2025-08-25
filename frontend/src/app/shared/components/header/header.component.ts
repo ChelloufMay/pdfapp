@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UploadDialogComponent } from '../upload-dialog/upload-dialog.component';
@@ -11,19 +11,20 @@ import { UploadDialogComponent } from '../upload-dialog/upload-dialog.component'
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  title = 'DocuVault';
+  @Input() dates: string[] = [];
+  @Input() types: string[] = [];
+  selectedDate = '';
+  selectedType = '';
   query = '';
 
   @Output() search = new EventEmitter<string>();
+  @Output() filterChanged = new EventEmitter<{date:string,type:string}>();
   @Output() uploadedEvent = new EventEmitter<void>();
 
-  onSearch() {
-    this.search.emit(this.query?.trim());
-  }
+  title = 'PDFExtractor';
 
-  // relay upload event from child
-  onUploaded() {
-    this.uploadedEvent.emit();
-  }
+  onSearch() { this.search.emit(this.query?.trim()); }
+  onFilterChange(){ this.filterChanged.emit({date:this.selectedDate, type:this.selectedType}); }
+  // restore Upload button behavior: when upload child emits, forward to parent
+  onUploaded(){ this.uploadedEvent.emit(); }
 }
-

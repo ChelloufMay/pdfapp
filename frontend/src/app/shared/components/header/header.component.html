@@ -1,24 +1,29 @@
 <div class="header-pill container">
-  <div class="left">
-    <div class="logo">DocuVault</div>
-  </div>
+  <div class="logo">{{ title }}</div>
 
   <div class="controls">
-    <!-- Upload dialog sits inline -->
+    <!-- UploadDialog inline (shows upload button) -->
     <app-upload-dialog (uploaded)="onUploaded()"></app-upload-dialog>
 
-    <!-- simple dropdown look (not wired to anything now) -->
-    <button class="chip">Dossier</button>
-    <select class="chip">
-      <option>Date</option>
-    </select>
-    <select class="chip">
-      <option>Type</option>
-    </select>
+    <!-- Date as calendar picker -->
+    <div class="chip">
+      <label for="datePick" style="font-weight:600;margin-right:6px;">Date</label>
+      <input id="datePick" type="date" [(ngModel)]="selectedDate" (change)="onFilterChange()" />
+    </div>
 
+    <!-- Type select -->
+    <div class="chip">
+      <label style="font-weight:600;margin-right:6px;">Type</label>
+      <select [(ngModel)]="selectedType" (change)="onFilterChange()">
+        <option value="">All</option>
+        <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+
+    <!-- Search grows to fill remaining space -->
     <div class="search">
-      <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Recherche ......" />
-      <button class="search-btn" (click)="onSearch()">🔍</button>
+      <input [(ngModel)]="query" (keyup.enter)="onSearch()" placeholder="Search documents..." />
+      <button class="chip" (click)="onSearch()">Search</button>
     </div>
   </div>
 </div>

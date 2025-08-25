@@ -1,14 +1,50 @@
 .overlay {
-  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  background: rgba(6,12,24,0.4); z-index: 2000;
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(6,12,24,0.45);
+  z-index:2000; padding:12px;
 }
+
 .modal {
-  width: min(900px, 94%);
-  max-height: 90vh; overflow:auto;
-  background:white; border-radius:12px; padding:16px;
-  box-shadow: 0 18px 50px rgba(10,30,60,0.2);
+  width:min(900px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background: linear-gradient(180deg,#fff, #6699f1);
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 18px 50px rgba(10,30,60,0.2);
 }
-.modal-header { display:flex; justify-content:space-between; align-items:center; }
-.modal-body { padding-top:8px; }
-.extracted { background:#f7fbff; padding:12px; border-radius:8px; white-space:pre-wrap; }
-.modal-footer { display:flex; justify-content:flex-end; margin-top:12px; }
+.modal-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.modal-header h3 {
+  margin:0;
+}
+.modal-body {
+  margin-top:10px;
+}
+.extracted pre {
+  background:#f7fbff;
+  padding:12px;
+  border-radius:8px;
+  white-space:pre-wrap;
+  max-height:50vh;
+  overflow:auto;
+}
+.chip {
+  padding:6px 10px;
+  border-radius:8px;
+  background:var(--accent);
+  color:white;
+  border:none;
+  cursor:pointer;
+  margin-left:6px;
+}
+

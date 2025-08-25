@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DocumentService } from '../../../core/services/document.service';
 import { finalize } from 'rxjs';
+import { HttpEventType } from '@angular/common/http';
+import { DocumentService } from '../../../core/services/document.service';
 
 @Component({
   selector: 'app-upload-dialog',
@@ -27,28 +28,22 @@ export class UploadDialogComponent {
 
   upload() {
     if (!this.selected || this.uploading) return;
-
     this.uploading = true;
     this.uploadProgress = 0;
-
     this.svc.uploadWithProgress(this.selected).pipe(
-      finalize(() => {
-        this.uploading = false;
-        this.uploadProgress = 0;
-      })
+      finalize(()=> { this.uploading = false; this.uploadProgress = 0; })
     ).subscribe({
-      next: (event: any) => {
-        // handle progress and final response
-        if (event.type === 1 && event.total) { // UploadProgress
-          this.uploadProgress = Math.round(100 * (event.loaded / event.total));
-        } else if (event.type === 4) { // Response
+      next: (ev:any) => {
+        if (ev.type === HttpEventType.UploadProgress && ev.total) {
+          this.uploadProgress = Math.round(100 * (ev.loaded / ev.total));
+        } else if (ev.type === HttpEventType.Response) {
           this.selected = undefined;
           this.uploaded.emit();
         }
       },
       error: (err) => {
         console.error('Upload failed', err);
-        alert('Upload failed: ' + (err?.statusText || err?.message || 'unknown'));
+        alert('Upload failed: ' + (err?.message || err?.statusText || 'unknown'));
       }
     });
   }

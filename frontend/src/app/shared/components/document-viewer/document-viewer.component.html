@@ -2,24 +2,27 @@
   <div class="modal">
     <div class="modal-header">
       <h3>{{ doc?.fileName }}</h3>
-      <button class="close" (click)="close()">✕</button>
+      <div>
+        <button (click)="copyText()" class="chip">Copy text</button>
+        <button (click)="close()" class="chip">Close</button>
+      </div>
     </div>
 
     <div class="modal-body">
-      <h4>Extracted text</h4>
-      <pre class="extracted">{{ doc?.data || 'No extracted text available.' }}</pre>
+      <section class="extracted">
+        <h4>Extracted text</h4>
+        <pre>{{ doc?.data || 'No extracted text available.' }}</pre>
+      </section>
 
-      <h4>Original file</h4>
-      <div *ngIf="doc?.fileUrl">
-        <a [href]="doc?.fileUrl" target="_blank" rel="noopener">Open original in new tab</a>
-        <br/>
-        <a [href]="doc?.fileUrl" target="_blank" rel="noopener" download>Download original</a>
-      </div>
-      <div *ngIf="!doc?.fileUrl">Original file not available.</div>
-    </div>
-
-    <div class="modal-footer">
-      <button (click)="close()">Close</button>
+      <section style="margin-top:12px;">
+        <h4>Original file</h4>
+        <div *ngIf="doc?.fileUrl">
+          • <a [href]="doc?.fileUrl" target="_blank">Open original</a> <br>
+          • <a [href]="doc?.fileUrl" target="_blank" download>Download original</a>
+        </div>
+        <div *ngIf="!doc?.fileUrl">Original file not available.</div>
+      </section>
     </div>
   </div>
 </div>
+

@@ -1,40 +1,109 @@
+/* header.component.scss — flexible / responsive header */
+
+/* ensure box-sizing to avoid sizing surprises */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* header container uses flex and wraps when narrow */
 .header-pill {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  background: linear-gradient(90deg,#eef4ff 0%, #f7f9ff 100%);
-  padding:14px 18px;
-  border-radius:18px;
-  box-shadow: 0 8px 24px rgba(20,40,80,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(90deg, #df00ff, #0061c1);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(20, 40, 80, 0.06);
+
+  /* allow children to wrap to next line on small screens */
+  flex-wrap: wrap;
 }
 
+/* Logo: fixed size, does not grow or shrink */
 .logo {
-  font-weight:700;
-  font-size:18px;
-  color:#243b5a;
+  font-weight: 700;
+  font-size: 18px;
+  color: #000000;
+  flex: 0 0 auto;
+  margin-right: 6px;
 }
 
+/* Controls group: can grow and shrink, but maintain minimum shrinking behavior */
 .controls {
-  display:flex;
-  gap:10px;
-  align-items:center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  /* THIS is the key: allow the whole controls area to grow/shrink */
+  flex: 1 1 auto;
+
+  /* allow children inputs to shrink inside this container (prevents overflow) */
+  min-width: 0;
 }
 
+/* chips (date/type etc) should not stretch; allow them to wrap/flow */
 .chip {
-  background:white;
-  border-radius:12px;
-  padding:8px 12px;
-  border: 1px solid rgba(30,60,120,0.06);
-  cursor:pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(30, 60, 120, 0.06);
+
+  /* do not allow chips to grow; let them be their intrinsic size */
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
-.search { display:flex; align-items:center; gap:6px; }
-.search input {
-  height:36px; border-radius:8px; padding:6px 10px; border: 1px solid rgba(30,60,120,0.06);
-  min-width:260px;
+/* Search area: THIS must be flexible so it expands and shrinks nicely */
+.search {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+
+  /* allow search to take remaining space and shrink when needed */
+  flex: 1 1 300px;  /* preferred width 300px, but allow shrink/grow */
+  min-width: 0;     /* crucial: allow children to actually shrink */
 }
-.search-btn {
-  background: var(--accent); color:white; border:none; border-radius:8px; padding:8px 10px;
-  cursor:pointer;
+
+/* input takes full width of its flex item */
+.search input {
+  width: 100%;
+  min-width: 0;    /* allow input itself to shrink inside flexbox */
+  height: 36px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(30, 60, 120, 0.06);
+  background: white;
+  outline: none;
+}
+
+/* optional: make selects and date input compact but flexible */
+.chip select,
+.chip input[type="date"] {
+  border: none;
+  background: transparent;
+  height: 32px;
+  padding: 2px 6px;
+  font-size: 14px;
+  min-width: 0; /* allow them to shrink in small viewports */
+}
+
+/* small-screen adjustments */
+@media (max-width: 720px) {
+  .header-pill {
+    padding: 10px;
+    gap: 8px;
+  }
+  .logo { font-size: 16px; }
+
+  /* when small, make the search take full line */
+  .search { flex-basis: 100%; order: 3; }
+  .chip { flex: 0 0 auto; }
+
+  /* make controls wrap nicely: ensure chips flow in two rows if needed */
+  .controls { gap: 8px; }
 }

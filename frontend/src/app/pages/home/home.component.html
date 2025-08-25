@@ -1,25 +1,33 @@
-<div class="container app-shell">
-  <app-header (search)="onSearch($event)" (uploadedEvent)="onUploaded()"></app-header>
+<div class="container">
+  <app-header [dates]="dates" [types]="types" (search)="onSearch($event)" (filterChanged)="onFilterChanged($event)" (uploadedEvent)="onUploaded()"></app-header>
 
-  <h3 style="margin-top:18px; color:#2b4a78;">Fichiers</h3>
+  <h3 style="margin-top:18px; color:#2b4a78;">Files</h3>
 
   <div class="grid">
-    <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDelete($event)" (view)="openViewer($event)"></app-file-card>
+    <app-file-card *ngFor="let d of pageDocs" [doc]="d" (deleted)="onDeleteRequest($event)" (view)="openViewer($event)"></app-file-card>
   </div>
 
   <div class="pager">
-    <div class="items-per">Items per page:
-      <select [(ngModel)]="pageSize" (change)="updatePage()">
-        <option>6</option><option>12</option><option>15</option><option>24</option>
-      </select>
+    <div>
+      Items per page:
+      <select [(ngModel)]="pageSize" (change)="updatePage()"><option>6</option><option>12</option><option>15</option><option>24</option></select>
     </div>
 
-    <div class="page-controls">
+    <div>
       <button (click)="pagePrev()" [disabled]="pageIndex===0">‹</button>
-      <span>{{ pageIndex + 1 }} / {{ totalPages }}</span>
+      <span>{{ pageIndex+1 }} / {{ totalPages }}</span>
       <button (click)="pageNext()" [disabled]="(pageIndex+1)*pageSize>=docs.length">›</button>
     </div>
   </div>
 
   <app-document-viewer [doc]="viewerDoc" [visible]="viewerVisible" (closed)="closeViewer()"></app-document-viewer>
+
+  <!-- confirmation dialog -->
+  <app-confirm-dialog
+    [visible]="confirmVisible"
+    [title]="'Delete file'"
+    [message]="'Are you sure you want to permanently delete \"' + (confirmTargetName || '') + '\" ?'"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeConfirm()"
+  ></app-confirm-dialog>
 </div>

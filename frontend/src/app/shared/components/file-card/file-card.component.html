@@ -1,16 +1,28 @@
 <div class="card">
-  <div class="thumb"></div>
-  <div class="body">
-    <div class="title">{{ doc.fileName }}</div>
-    <div class="meta">{{ mimeLabel() }}</div>
-    <div class="size kv-muted">{{ (doc.fileSize/1024) | number:'1.0-2' }} KB</div>
+  <button class="menu-btn" (click)="toggleMenu()" aria-label="Open menu">⋮</button>
 
-    <div class="card-actions">
-      <button (click)="onOpen()">Open</button>
-      <button (click)="onViewExtracted()">View</button>
-      <button (click)="onDownload()">Download</button>
-      <button (click)="onDelete()" class="delete">Delete</button>
-    </div>
+  <div *ngIf="showMenu" class="menu" role="menu" (click)="$event.stopPropagation()">
+    <div class="menu-item" role="menuitem" (click)="onOpen(); showMenu=false">Open in new tab</div>
+    <div class="menu-item" role="menuitem" (click)="onDownload(); showMenu=false">Download</div>
+  </div>
+
+  <div class="thumb" aria-hidden="true">
+    <svg *ngIf="doc.contentType && doc.contentType.toLowerCase().includes('pdf')" width="60" height="60" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="2" width="14" height="20" rx="2" fill="#e74c3c"></rect>
+      <path d="M7 7H13" stroke="#fff" stroke-width="1.2"/>
+      <path d="M7 11H13" stroke="#fff" stroke-width="1.2"/>
+      <path d="M7 15H11" stroke="#fff" stroke-width="1.2"/>
+    </svg>
+    <div *ngIf="!doc.contentType || !doc.contentType.toLowerCase().includes('pdf')">{{ mimeLabel() }}</div>
+  </div>
+
+  <div class="title" [title]="doc.fileName">{{ doc.fileName }}</div>
+  <div class="meta">{{ mimeLabel() }} • {{ (doc.fileSize/1024) | number:'1.0-0' }} KB</div>
+
+  <div class="actions">
+    <button class="text-btn" (click)="onView()">View</button>
+    <button class="text-btn delete" (click)="onDelete()">Delete</button>
   </div>
 </div>
+
 
