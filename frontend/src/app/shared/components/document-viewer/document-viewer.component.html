@@ -1,45 +1,50 @@
-<div class="overlay" *ngIf="visible">
-  <div class="modal">
+<!-- frontend/src/app/shared/components/document-viewer/document-viewer.component.html -->
+<!-- Guard with visible && doc as d so inside `d` is non-null for strict templates -->
+
+<div class="overlay" *ngIf="visible && doc as d">
+  <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="d.fileName">
     <div class="modal-header">
-      <h3>{{ doc?.fileName }}</h3>
+      <h3>{{ d.fileName }}</h3>
       <div>
-        <button class="chip" (click)="copyKeywordsToClipboard()">Copy keywords</button>
+        <button class="chip" (click)="copyKeywordsToClipboard()" [disabled]="!stats?.length">Copy keywords</button>
         <button class="chip" (click)="close()">Close</button>
       </div>
     </div>
 
     <div class="modal-body">
-      <section class="keywords">
-        <h4>Top keywords</h4>
+      <section style="margin-top:16px;">
+        <h4>Keyword statistics (computed from file)</h4>
 
-        <div *ngIf="keywordsList && keywordsList.length; else noKeywords">
-          <div *ngFor="let k of keywordsList" class="keyword-row">
+        <div *ngIf="loading">Computing keyword stats…</div>
+
+        <div *ngIf="!loading && stats?.length">
+          <div *ngFor="let s of stats" class="keyword-row">
             <div class="kw-left">
-              <span class="kw-word">{{ k.word }}</span>
-              <span class="kv-muted">({{ k.count }})</span>
+              <span class="kw-word">{{ s.word }}</span>
+              <span class="kv-muted">({{ s.score }})</span>
             </div>
             <div class="kw-right">
-              <div class="kw-bar-bg">
-                <div class="kw-bar" [style.width.%]="k.percent"></div>
-              </div>
-              <div class="kw-pct">{{ k.percent }}%</div>
+              <div class="kw-bar-bg"><div class="kw-bar" [style.width.%]="s.percent"></div></div>
+              <div class="kw-pct">{{ s.percent }}%</div>
             </div>
           </div>
         </div>
-        <ng-template #noKeywords>
-          <div class="kv-muted">No keywords available for this file.</div>
-        </ng-template>
+
+        <div *ngIf="!loading && (!stats || stats.length === 0)" class="kv-muted">
+          No keyword statistics available (file may contain no textual content).
+        </div>
       </section>
 
       <section style="margin-top:14px;">
         <h4>Original file</h4>
-        <div *ngIf="doc?.fileUrl">
-          •<a [href]="doc?.fileUrl" target="_blank" rel="noopener">Open original</a> <br>
-          •<a [href]="doc?.fileUrl" target="_blank" rel="noopener" download>Download original</a>
+        <div *ngIf="d.fileUrl; else noOriginal">
+          •<a [href]="d.fileUrl" target="_blank" rel="noopener">Open original</a> <br>
+          •<a [href]="d.fileUrl" target="_blank" rel="noopener" download>Download original</a>
         </div>
-        <div *ngIf="!doc?.fileUrl">Original file not available.</div>
+        <ng-template #noOriginal>
+          <div class="kv-muted">Original file not available.</div>
+        </ng-template>
       </section>
     </div>
   </div>
 </div>
-

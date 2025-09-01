@@ -1,59 +1,90 @@
 # documents/admin.py
+"""
+Django admin configuration for the `Document` model.
+
+Features:
+- List view shows useful metadata (filename, short id, created date, size, MIME type, language).
+- A compact "Top keywords" preview column renders up to 6 small badges for quick scanning.
+- A "File" column exposes a safe link to view/download the stored file.
+- Admin search has been extended to include a substring search on the JSON `data`
+  (so you can search for keywords) while still using the standard `search_fields`.
+- Read-only fields include metadata that should not be edited manually.
+- The preview code is defensive and supports several possible shapes for `data`:
+  - list of strings (preferred in the current design)
+  - list of dicts (older formats that included counts/percent)
+  - JSON string (serialized list)
+"""
+
 from django.contrib import admin
 from django.utils.html import format_html, format_html_join
 from django.db.models import Q
 from .models import Document
+import json
+from typing import Any
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    """
-    Admin for Document model.
-    - Displays file metadata and a short preview of the extracted keywords stored
-      in `data` (JSONField).
-    - Provides a custom search implementation that looks in fileName and performs
-      a simple substring search against the JSON `data` (so you can search keywords).
-    """
+    # Columns shown in the list display
+    list_display = (
+        'fileName',
+        'short_id',
+        'creationDate',
+        'fileSize',
+        'contentType',
+        'language',
+        'keywords_preview',
+        'file_link',
+    )
 
-    # columns shown in the list view
-    list_display = ('fileName', 'id', 'creationDate', 'fileSize', 'contentType', 'keywords_preview', 'file_link')
+    # Filters on the right-hand sidebar
+    list_filter = ('creationDate', 'contentType', 'language')
 
-    # quick filters on the right sidebar
-    list_filter = ('creationDate', 'contentType')
-
-    # default search_fields should only include text-like fields that admin can search quickly.
-    # We *do not* include 'data' here because it's JSON; instead we override get_search_results()
-    # to search in data safely (see below).
+    # Search will use fileName by default; we also override get_search_results()
     search_fields = ('fileName',)
 
-    # fields that should be read-only in the admin form
-    readonly_fields = ('id', 'creationDate', 'fileSize', 'contentType', 'file_link')
+    # Read-only metadata in the admin form
+    readonly_fields = ('id', 'creationDate', 'fileSize', 'contentType', 'language', 'file_link', 'keywords_full')
 
-    # how many items per page
+    # How many items per admin page
     list_per_page = 30
 
-    def file_link(self, obj):
-        """Return an HTML link to the file (if present)."""
+    # Optional: make the id column shorter and more readable
+    def short_id(self, obj: Document) -> str:
+        """Show a truncated ID for readability in list view."""
+        return str(obj.id)[:8] if obj and obj.id else ''
+    short_id.short_description = 'ID'
+
+    def file_link(self, obj: Document) -> str:
+        """
+        Return an HTML link to the file (if present). Safe: wrapped via format_html.
+        This renders in both list and read-only form view.
+        """
         if obj.file:
             try:
-                return format_html('<a href="{}" target="_blank" rel="noopener noreferrer">Download / View</a>', obj.file.url)
+                return format_html('<a href="{}" target="_blank" rel="noopener noreferrer">View / Download</a>', obj.file.url)
             except Exception:
                 return "File (unavailable)"
         return "No file"
     file_link.short_description = "File"
 
-    def keywords_preview(self, obj):
+    def keywords_preview(self, obj: Document) -> str:
         """
-        Display the top keywords stored in obj.data (which is a list of {word,count,percent} dicts).
-        We show up to 5 keywords as small badges. If obj.data is not present or empty, show a hint.
+        Render a compact preview of keywords stored in obj.data.
+        Accepts:
+          - a Python list of strings: ['invoice', 'due date']
+          - a Python list of dicts: [{'word':'invoice','count':4,'percent':1.2}, ...]
+          - a JSON string representing one of the above
+        Shows up to 6 badges; if there's no data, shows a muted hint.
         """
         raw = getattr(obj, 'data', None)
         if not raw:
             return format_html('<span style="color:#888;">No keywords</span>')
 
-        # defensive: raw may be a JSON string or a list
+        # Defensive: parse JSON string if necessary
+        parsed = None
         try:
             if isinstance(raw, str):
-                import json
+                # attempt to parse JSON string
                 parsed = json.loads(raw)
             else:
                 parsed = raw
@@ -63,44 +94,73 @@ class DocumentAdmin(admin.ModelAdmin):
         if not parsed or not isinstance(parsed, (list, tuple)):
             return format_html('<span style="color:#888;">Invalid data</span>')
 
-        # take first up to 5 keywords
-        items = []
-        for k in parsed[:5]:
-            # k may be dict-like or a fallback shape
-            word = k.get('word') if isinstance(k, dict) else str(k)
-            pct = k.get('percent') if isinstance(k, dict) else None
-            label = f"{word}" if pct is None else f"{word} ({pct}%)"
-            items.append(label)
+        # Build labels for up to 6 items. Support both dict and string item shapes.
+        labels = []
+        for item in parsed[:6]:
+            if isinstance(item, dict):
+                # dict may be {word:..., count:..., percent:...} or other
+                word = item.get('word') or item.get('keyword') or item.get('k') or ''
+                pct = item.get('percent')
+                if pct is not None:
+                    label = f"{word} ({pct}%)"
+                else:
+                    label = f"{word}"
+            else:
+                # fallback: treat item as plain string
+                label = str(item)
+            labels.append(label)
 
-        # render as comma-separated tiny badges
+        if not labels:
+            return format_html('<span style="color:#888;">No keywords</span>')
+
+        # Render as small inline badges
         html = format_html_join(
             ' ',
-            '<span style="display:inline-block;padding:2px 6px;border-radius:10px;background:#eef6ff;color:#25406a;font-size:11px;margin-right:4px;">{}</span>',
-            ((it,) for it in items)
+            '<span style="display:inline-block;padding:3px 8px;border-radius:999px;background:#eef6ff;color:#25406a;font-size:11px;margin-right:6px;">{}</span>',
+            ((lbl,) for lbl in labels)
         )
         return html
     keywords_preview.short_description = "Top keywords"
     keywords_preview.allow_tags = True
 
+    def keywords_full(self, obj: Document) -> str:
+        """
+        Read-only field to show the full JSON of keywords in the detail view.
+        This is helpful for inspection when you click into a Document.
+        """
+        raw = getattr(obj, 'data', None)
+        if not raw:
+            return "(empty)"
+        try:
+            # Pretty-print JSON when possible
+            if isinstance(raw, str):
+                parsed = json.loads(raw)
+            else:
+                parsed = raw
+            pretty = json.dumps(parsed, ensure_ascii=False, indent=2)
+            # wrap in <pre> with small styling
+            return format_html('<pre style="max-width:900px; white-space:pre-wrap; font-size:12px;">{}</pre>', pretty)
+        except Exception:
+            # last resort: show str()
+            return format_html('<pre style="font-size:12px;">{}</pre>', str(raw))
+    keywords_full.short_description = "Keywords (full)"
+
     def get_search_results(self, request, queryset, search_term):
         """
-        Override admin search to:
-         - search fileName (icontains)
-         - OR search for the substring inside the data JSON field (data__icontains)
-        This lets admins type a keyword (e.g. "invoice") and find documents that include it.
+        Extend admin search:
+          - keep default behavior for fileName (and other search_fields)
+          - also include documents whose JSON `data` contains the substring `search_term`
+        This allows searching for keywords (simple substring match) without indexing.
         """
-        # First let the default behavior handle simple cases on fileName (and other search_fields)
         qs, use_distinct = super().get_search_results(request, queryset, search_term)
 
-        # If there is a search term, expand to include documents whose JSON `data` contains the term.
         if search_term:
             try:
-                # This does a simple substring match against the JSON field.
+                # data__icontains works for JSON/text backends where Django supports it.
                 extra_qs = queryset.filter(Q(data__icontains=search_term) | Q(fileName__icontains=search_term))
-                # Combine with the existing qs results
                 qs = (qs | extra_qs).distinct()
             except Exception:
-                # Some DB backends/configs may not support data__icontains; ignore in that case.
+                # If the DB backend does not support data__icontains, ignore gracefully.
                 pass
 
         return qs, use_distinct

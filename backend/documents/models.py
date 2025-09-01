@@ -4,29 +4,32 @@ import uuid
 import mimetypes
 from django.db import models
 
-
 def upload_to_uploads(instance, filename):
     return os.path.join('uploads', filename)
 
-
 class Document(models.Model):
     """
-    Document model. NOTE: `data` stores the extracted keywords JSON array:
-      data = [
-        {"word": "invoice", "count": 8, "percent": 4.0},
-        ...
-      ]
+    Document model.
+    - data: raw extracted text (empty string if none)
+    - keywords: cleaned unique keywords list (defaults to empty list)
+    - keyword_scores: mapping keyword -> score (defaults to empty dict)
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     file = models.FileField(upload_to=upload_to_uploads, null=True, blank=True)
     fileName = models.CharField(max_length=512, blank=True)
     creationDate = models.DateTimeField(auto_now_add=True)
 
-    # data is JSONField containing keywords array (replaces raw extracted text)
-    data = models.JSONField(null=True, blank=True, help_text="List of keywords and their stats")
+    # store raw text (use empty string as default to avoid NULL migration issues)
+    data = models.TextField(blank=True, default='', help_text="Extracted raw text from document")
 
-    # file metadata
+    # cleaned unique keywords, JSON list (default empty list)
+    keywords = models.JSONField(default=list, blank=True, help_text="List of unique keywords")
+
+    # mapping keyword -> score (default empty dict)
+    keyword_scores = models.JSONField(default=dict, blank=True, help_text="Mapping keyword -> extractor score")
+
+    language = models.CharField(max_length=8, blank=True, help_text="Detected language code")
+
     fileSize = models.BigIntegerField(null=True, blank=True)
     contentType = models.CharField(max_length=128, blank=True)
 
@@ -47,15 +50,12 @@ class Document(models.Model):
             return ''
 
     def save(self, *args, **kwargs):
-        # set filename if missing
         if self.file and not self.fileName:
             self.fileName = os.path.basename(self.file.name)
 
-        # call parent to ensure file is written to disk first
         super().save(*args, **kwargs)
 
         changed = False
-        # fill fileSize if missing
         if self.file and (self.fileSize is None):
             try:
                 self.fileSize = self.file.size
@@ -63,7 +63,6 @@ class Document(models.Model):
             except Exception:
                 pass
 
-        # fill contentType if missing
         if self.file and not self.contentType:
             guessed_type = None
             try:
