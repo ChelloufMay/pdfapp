@@ -1,5 +1,5 @@
 # PDF Extractor
-## What this project is
+- What this project is
 PDF Extractor is a simple web application that automatically extract information from uploaded documents (PDFs and images). It extracts the main text, detects or extracts a human-friendly title, and identifies concise keywords for quick searching and inspection. The backend is built with Django + Django REST Framework and the frontend is a single-page Angular app. The project is intended for private or internal use.
 ## Main features
 - Upload PDF and image files through an API or the web UI.
