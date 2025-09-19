@@ -22,7 +22,8 @@ backend/ (Django project):
 - keywords.py — keyword extraction wrapper (YAKE-based)
 - media/ — user-uploaded files stored on disk during development
 - manage.py and Django config files
-frontend/ (Angular application)
+
+frontend/ (Angular application):
 - src/app/core/services — DocumentService: talks to the backend API
 - src/app/shared/components — reusable UI pieces (file cards, upload dialog, document viewer, etc.)
 - src/app/features — page-level features (home/list, document view)
