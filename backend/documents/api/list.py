@@ -10,7 +10,7 @@ from ..serializers import DocumentSerializer
 from rest_framework.permissions import AllowAny
 
 class DocumentListAPIView(ListAPIView):
-    # Use the actual field name that exists on your model: creationDate
+    # Use the actual field name that exists on the model: creationDate
     queryset = Document.objects.all().order_by('-creationDate')
     serializer_class = DocumentSerializer
     permission_classes = [AllowAny]

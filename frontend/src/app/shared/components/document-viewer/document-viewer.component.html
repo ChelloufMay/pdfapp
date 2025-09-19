@@ -5,19 +5,36 @@
   <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="d.fileName">
     <div class="modal-header">
       <h3>{{ d.fileName }}</h3>
-      <div>
-        <button class="chip" (click)="copyKeywordsToClipboard()" [disabled]="!stats?.length">Copy keywords</button>
+      <div class="header-actions">
+        <button class="chip" (click)="copyKeywordsToClipboard()" [disabled]="!stats.length">Copy keywords</button>
+
+
+
         <button class="chip" (click)="close()">Close</button>
       </div>
     </div>
 
     <div class="modal-body">
+      <section class="titles-section" *ngIf="getTitleChips().length">
+        <h4>Titles</h4>
+        <div class="chips-row">
+          <span class="chip-box title-chip" *ngFor="let t of getTitleChips()">{{ t }}</span>
+        </div>
+      </section>
+
+      <section class="stored-keywords" *ngIf="getStoredKeywordChips().length">
+        <h4>Stored keywords</h4>
+        <div class="chips-row">
+          <span class="chip-box kw-chip" *ngFor="let k of getStoredKeywordChips()">{{ k }}</span>
+        </div>
+      </section>
+
       <section style="margin-top:16px;">
         <h4>Keyword statistics (computed from file)</h4>
 
         <div *ngIf="loading">Computing keyword stats…</div>
 
-        <div *ngIf="!loading && stats?.length">
+        <div *ngIf="!loading && stats.length">
           <div *ngFor="let s of stats" class="keyword-row">
             <div class="kw-left">
               <span class="kw-word">{{ s.word }}</span>
@@ -36,11 +53,11 @@
       </section>
 
       <section style="margin-top:14px;">
-        <h4>Original file</h4>
-        <div *ngIf="d.fileUrl; else noOriginal">
-          •<a [href]="d.fileUrl" target="_blank" rel="noopener">Open original</a> <br>
-          •<a [href]="d.fileUrl" target="_blank" rel="noopener" download>Download original</a>
-        </div>
+
+
+        <div class="original-actions">
+          <a [href]="d.fileUrl" target="_blank" rel="noopener" class="link">Open original in new tab</a> </div>
+
         <ng-template #noOriginal>
           <div class="kv-muted">Original file not available.</div>
         </ng-template>

@@ -1,7 +1,3 @@
-<!-- file-card.component.html -->
-<!-- Guard the whole card so inside the block `d` is strongly typed (non-null). -->
-<!-- This avoids TS2533 "Object is possibly 'null' or 'undefined'". -->
-
 <ng-container *ngIf="doc as d">
   <div class="card" (click)="$event.stopPropagation()">
 
@@ -16,17 +12,29 @@
 
     <!-- thumbnail: show PDF icon if contentType indicates pdf -->
     <div class="thumb" aria-hidden="true">
-      <svg *ngIf="d.contentType && d.contentType.toLowerCase().includes('pdf')" width="60" height="60" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="2" width="14" height="20" rx="2" fill="#e74c3c"></rect>
-        <path d="M7 7H13" stroke="#fff" stroke-width="1.2"/>
-        <path d="M7 11H13" stroke="#fff" stroke-width="1.2"/>
-        <path d="M7 15H11" stroke="#fff" stroke-width="1.2"/>
-      </svg>
+      <!-- --------------------------------
+         NEW: show image preview when contentType is image/*
+         -------------------------------- -->
+      <ng-container *ngIf="d.contentType && d.contentType.toLowerCase().startsWith('image/'); else pdfThumb">
+        <img class="preview-image" [src]="d.fileUrl" [alt]="d.fileName" />
+      </ng-container>
+      <!-- --------------------------------
+         END NEW
+         -------------------------------- -->
 
-      <!-- fallback label when no PDF content type -->
-      <div *ngIf="!d.contentType || !d.contentType.toLowerCase().includes('pdf')">
-        {{ mimeLabel() }}
-      </div>
+      <ng-template #pdfThumb>
+        <svg *ngIf="d.contentType && d.contentType.toLowerCase().includes('pdf')" width="60" height="60" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="2" width="14" height="20" rx="2" fill="#e74c3c"></rect>
+          <path d="M7 7H13" stroke="#fff" stroke-width="1.2"/>
+          <path d="M7 11H13" stroke="#fff" stroke-width="1.2"/>
+          <path d="M7 15H11" stroke="#fff" stroke-width="1.2"/>
+        </svg>
+
+        <!-- fallback label when no PDF content type -->
+        <div *ngIf="!d.contentType || !d.contentType.toLowerCase().includes('pdf')">
+          {{ mimeLabel() }}
+        </div>
+      </ng-template>
     </div>
 
     <!-- file name with safe title attribute -->
@@ -35,9 +43,18 @@
     <!-- meta: mime label and size (safe navigation for fileSize) -->
     <div class="meta">{{ mimeLabel() }} • {{ (d.fileSize ?? 0) / 1024 | number:'1.0-0' }} KB</div>
 
-    <!-- actions: view and delete -->
+    <!-- actions: view, download (NEW), and delete -->
     <div class="actions">
       <button class="text-btn" (click)="onView(); $event.stopPropagation()">View</button>
+
+      <!-- --------------------------------
+         NEW: immediate download button (does not require opening file first)
+         -------------------------------- -->
+      <button class="text-btn" (click)="onDownload(); $event.stopPropagation()">Download</button>
+      <!-- --------------------------------
+         END NEW
+         -------------------------------- -->
+
       <button class="text-btn delete" (click)="onDelete(); $event.stopPropagation()">Delete</button>
     </div>
   </div>
@@ -47,4 +64,3 @@
 <ng-template #noDoc>
   <!-- empty or show a small placeholder if you want -->
 </ng-template>
-

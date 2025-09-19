@@ -20,6 +20,7 @@ export interface KeywordStat {
 export interface DocumentDto {
   id: string;
   fileName: string;
+  title?: string | null;            // <-- ADDED: title field (extracted on backend)
   creationDate: string;
   // data: raw extracted text (if used)
   data?: string | null;

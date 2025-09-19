@@ -4,8 +4,19 @@
   --bg: #eef6fb;
   --panel: #f6f9ff;
   --accent: #ff4b66;
-  --muted: #6b7f99;
+  --muted: #000000;
 }
+
+/* src/styles.scss or src/styles.css */
+:root{
+  --inter-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Example usage fallback (optional) */
+body {
+  font-family: var(--inter-font);
+}
+
 
 html,body {
   height:100%;

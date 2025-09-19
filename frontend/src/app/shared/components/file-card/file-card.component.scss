@@ -85,10 +85,49 @@
   font-weight:600;
 }
 
+.pdf-icon svg { display: block; }
+
 .text-btn.delete {
   color:#ff4d4f;
 }
 
+/*--------------------------------------------------*/
 
+
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* pdf icon center */
+.pdf-icon svg { display: block; }
+
+
+
+.subtitle {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* actions */
+.actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 8px;
+  justify-content: space-between;
+}
+
+.btn {
+  border: none;
+  background: #eef2ff;
+  color: #1f2937;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
 
 
