@@ -1,5 +1,6 @@
 # PDF Extractor
 - What this project is
+
 PDF Extractor is a simple web application that automatically extract information from uploaded documents (PDFs and images). It extracts the main text, detects or extracts a human-friendly title, and identifies concise keywords for quick searching and inspection. The backend is built with Django + Django REST Framework and the frontend is a single-page Angular app. The project is intended for private or internal use.
 ## Main features
 - Upload PDF and image files through an API or the web UI.
@@ -21,7 +22,6 @@ backend/ (Django project):
 - keywords.py — keyword extraction wrapper (YAKE-based)
 - media/ — user-uploaded files stored on disk during development
 - manage.py and Django config files
--
 frontend/ (Angular application)
 - src/app/core/services — DocumentService: talks to the backend API
 - src/app/shared/components — reusable UI pieces (file cards, upload dialog, document viewer, etc.)
@@ -46,16 +46,23 @@ Each uploaded document stores:
 - Search (GET): query parameter q used to search the extracted text and other searchable fields; returns matching files.
 - Keyword statistics (GET per-document): returns keyword list with computed percentages for display.
 - Download (GET per-document): returns the original file as an attachment for immediate download.
+
 --> All endpoints are available under the API base path. The Angular frontend is configured to use these endpoints.
 ## How it works (flow)
-1. User uploads a file through the frontend or sends it to the upload API.
-2. Backend stores the file on disk (media/uploads) and creates a database record.
-3. The extractor runs:
+1.User uploads a file through the frontend or sends it to the upload API.
+
+2.Backend stores the file on disk (media/uploads) and creates a database record.
+
+3.The extractor runs:
 - For PDFs: attempt selectable text extraction. If the text is insufficient and OCR fallback is enabled, OCR is attempted.
 - For images: OCR via pytesseract.
-4. The extractor also tries to determine a short title (PDF metadata, layout heuristics, or first meaningful line of text).
+
+4.The extractor also tries to determine a short title (PDF metadata, layout heuristics, or first meaningful line of text).
+
 5.Extracted text is sent to the keyword extractor (YAKE) to produce a list of keywords and their scores.
+
 6.Backend persists extracted text, the list of keywords, scores, language, and title in the database.
+
 7.Frontend lists the documents, allows viewing keyword statistics, downloading the original file, and searching.
 ## Tools and libraries used
 Backend:
