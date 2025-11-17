@@ -74,6 +74,7 @@ Backend:
 - pdf2image (optional) for OCR of scanned PDFs (requires Poppler)
 - YAKE for keyword extraction
 - Other Python utilities and supporting libraries
+
 Frontend:
 - Angular (standalone components)
 - Angular HttpClient for API communication
